@@ -1,0 +1,99 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <title>Auto-Refresh Weather Widget</title>
+  <style>
+
+    body {
+  display: block;
+  white-space: pre-line;
+  font-family: Arial, sans-serif;
+  font-size: medium;
+}
+
+.weather-item {
+  display: block;
+  margin: 6px 0;
+}
+    .widget {
+      width: auto;
+      max-height: auto;
+      overflow-y: auto;
+      background: #fff;
+      padding: 15px;
+      border-radius: 8px;
+      box-shadow: 0 2px 6px rgba(0,0,0,0.2);
+      border: 1px solid red;
+
+    }
+    
+  </style>
+  <link rel="manifest" href="manifest.json">
+
+
+</head>
+<body>
+  <div class="widget" id="weatherWidget">
+    <div class="weather-item">📍 Location:</div>
+    <div class="weather-item">🌤 Condition:</div>
+    <div class="weather-item">🌡 Temperature:</div>
+    <div class="weather-item">💨 Wind:</div>
+    <div class="weather-item">💧 Humidity:</div>
+    <div class="weather-item">☔️ Precipitation:</div>
+  </div>
+
+  <script>
+    const labels = [
+    "📍 Location", "🌡 Temperature", "💨 Wind Speed", "🌤 Condition"
+  ];
+  const widget = document.getElementById("weatherWidget");
+
+  function fetchWeather() {
+    const lat = 40.77791;
+    const lon = -74.24973;
+    const url = `http://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,weathercode&timezone=auto`;
+
+    fetch(url)
+      .then(response => response.json())
+      .then(data => {
+        const current = data.current;
+        const weatherCodeMap = {
+          0: "Clear sky", 1: "Mainly clear", 2: "Partly cloudy", 3: "Overcast",
+          45: "Fog", 48: "Rime fog", 51: "Light drizzle", 61: "Light rain",
+          80: "Rain showers", 95: "Thunderstorm"
+        };
+
+        const tempC = current.temperature_2m;
+        const tempF = Math.round(tempC * 9 / 5 + 32);
+
+        const lines = [
+          "West Orange, NJ",
+          `${tempC} °C / ${tempF} °F`,
+          `${current.wind_speed_10m} km/h`,
+          weatherCodeMap[current.weathercode] || "Unknown"
+        ];
+
+        widget.innerHTML = "";
+        lines.forEach((value, i) => {
+          const item = document.createElement("div");
+          item.className = "weather-item";
+          item.textContent = `${labels[i]}: ${value}`;
+          widget.appendChild(item);
+        });
+      })
+      .catch(error => {
+        widget.innerHTML = `<div class="weather-item">⚠️ Error: ${error}</div>`;
+      });
+  }
+
+  fetchWeather();
+  setInterval(fetchWeather, 600000); // refresh every 10 minutes
+
+  if ("serviceWorker" in navigator) {
+    navigator.serviceWorker.register("service-worker.js");
+  }
+
+  </script>
+</body>
+</html>
