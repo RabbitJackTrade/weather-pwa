@@ -52,7 +52,7 @@
   function fetchWeather() {
     const lat = 40.77791;
     const lon = -74.24973;
-    const url = `http://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,weathercode&timezone=auto`;
+    const url = `https://api.open-meteo.com/v1/forecast?latitude=${lat}&longitude=${lon}&current=temperature_2m,wind_speed_10m,weathercode&timezone=auto`;
 
     fetch(url)
       .then(response => response.json())
