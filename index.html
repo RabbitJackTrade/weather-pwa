@@ -89,6 +89,12 @@
 
   fetchWeather();
   setInterval(fetchWeather, 600000); // refresh every 10 minutes
+// Listen for messages from the service worker
+navigator.serviceWorker.addEventListener('message', (event) => {
+  if (event.data && event.data.type === 'REFRESH_PAGE') {
+    window.location.reload(true);
+  }
+});
 
 
 
